@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/player.css" />
+
+    <style>
+      body {
+        max-width: 800px;
+        margin: auto;
+        font-family: 'Roboto', sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="player">
+      <video
+        class="player__video"
+        poster="./media/maxvi-PS-04-poster.jpg"
+        playsinline
+      >
+        <source src="./media/maxvi-PS-04.mp4" type="video/mp4" />
+        Ваш браузер не поддерживает тег video
+      </video>
+    </div>
+  </body>
+
+  <script src="./js/player.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const players = document.querySelectorAll('.player');
+      players.forEach((player) => new Player(player));
+    });
+  </script>
+</html>
