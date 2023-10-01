@@ -1,43 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Player</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./css/player.css" />
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Player</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="./css/player.css" />
 
-    <style>
-      body {
-        max-width: 800px;
-        margin: auto;
-        font-family: 'Roboto', sans-serif;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="player">
-      <video
-        class="player__video"
-        poster="./media/maxvi-PS-04-poster.jpg"
-        playsinline
-      >
-        <source src="./media/maxvi-PS-04.mp4" type="video/mp4" />
-        Ваш браузер не поддерживает тег video
-      </video>
-    </div>
-  </body>
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+            }
 
-  <script src="./js/player.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const players = document.querySelectorAll('.player');
-      players.forEach((player) => new Player(player));
-    });
-  </script>
+            .container {
+                box-sizing: border-box;
+                min-height: inherit;
+                display: flex;
+                align-items: center;
+                width: 100%;
+                max-width: 1200px;
+                margin: auto;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+            .presentation {
+                box-sizing: border-box;
+                min-height: 100vh;
+                padding-top: 60px;
+                padding-bottom: 60px;
+
+                &:nth-child(1) {
+                    background-color: #eee;
+                }
+                &:nth-child(2) {
+                    background-color: #333;
+                }
+                &:nth-child(3) {
+                    background-color: #e3e3e3;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <section class="presentation">
+            <div class="container">
+                <div class="player">
+                    <video class="player__video" poster="./media/maxvi-PS-04-poster.jpg" playsinline muted controlsList="nodownload">
+                        <source src="./media/maxvi-PS-04.mp4" type="video/mp4" />
+                        Ваш браузер не поддерживает тег video
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <section class="presentation">
+            <div class="container">
+                <div class="player">
+                    <video class="player__video" poster="./media/maxvi-PS-04-poster.jpg" playsinline autoplay controlsList="nodownload">
+                        <source src="./media/maxvi-PS-04.mp4" type="video/mp4" />
+                        Ваш браузер не поддерживает тег video
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <section class="presentation">
+            <div class="container">
+                <div class="player">
+                    <video class="player__video" poster="./media/maxvi-PS-04-poster.jpg" playsinline autoplay controlsList="nodownload">
+                        <source src="./media/maxvi-PS-04.mp4" type="video/mp4" />
+                        Ваш браузер не поддерживает тег video
+                    </video>
+                </div>
+            </div>
+        </section>
+    </body>
+
+    <script src="./js/player.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const presentationObserver = new IntersectionObserver(
+                (entries, observer) => {
+                    entries.forEach((entry) => {
+                        const { target } = entry;
+                        const playerInicId = Number(target.dataset.playerUnicId);
+                        const playerInstance = playerInstances.find((instance) => {
+                            return instance.playerUnicId === playerInicId;
+                        });
+                        if (entry.isIntersecting) {
+                            playerInstance.autoPlay();
+                            return;
+                        }
+                        playerInstance.pauseVideo();
+                    });
+                },
+                {
+                    rootMargin: '-25% 0px -25% 0px',
+                }
+            );
+
+            const playerInstances = [];
+            const players = document.querySelectorAll('.player');
+
+            players.forEach((player) => {
+                playerInstances.push(new Player(player));
+                presentationObserver.observe(player);
+            });
+        });
+    </script>
 </html>
