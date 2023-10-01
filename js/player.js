@@ -114,6 +114,21 @@ class Player {
             }
         });
 
+        this.playerVideo.addEventListener('play', () => {
+            this.playerHandle.innerHTML = this.iconPause;
+            this.hideControlsWithDelay();
+        });
+
+        this.playerVideo.addEventListener('pause', () => {
+            this.playerHandle.innerHTML = this.iconPlay;
+            this.showControls();
+        });
+
+        this.playerVideo.addEventListener('suspend', (event) => {
+            console.log('video suspend', event);
+            this.unMuteVolume();
+        });
+
         this.playerVideo.addEventListener('durationchange', ({ target }) => {
             const { currentTime, duration } = target;
             this.updateTimeInformation(currentTime, duration);
@@ -140,6 +155,7 @@ class Player {
 
         this.playerVideo.addEventListener('click', () => {
             if (this.playerVideo.paused) {
+                this.unMuteVolume();
                 this.playVideo();
                 return;
             }
@@ -174,8 +190,6 @@ class Player {
 
     initializeVolume() {
         if (this.isIOS()) {
-            console.log('this.isIOS', this.isIOS);
-            console.log('this.playerVolumeBar', this.playerVolumeBar);
             this.playerVolumeBar.style.display = 'none ';
         }
 
@@ -238,14 +252,10 @@ class Player {
 
     playVideo() {
         this.playerVideo.play();
-        this.playerHandle.innerHTML = this.iconPause;
-        this.hideControlsWithDelay();
     }
 
     pauseVideo() {
         this.playerVideo.pause();
-        this.playerHandle.innerHTML = this.iconPlay;
-        this.showControls();
     }
 
     autoPlay() {
