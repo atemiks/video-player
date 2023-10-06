@@ -45,9 +45,9 @@ class Player {
     </div>
   `;
 
-    constructor(playerElement) {
+    constructor(playerElement, { autoPlay = false } = {}) {
         this.playerElement = playerElement;
-        this.playerUnicId = Math.floor(Math.random() * new Date().getTime());
+        this.autoPlay = autoPlay;
         this.playerVideo = undefined;
         this.playerHandle = undefined;
         this.playerIsland = undefined;
@@ -66,7 +66,6 @@ class Player {
     initialize() {
         const { playerElement } = this;
         this.playerElement.classList.add('initialized');
-        this.playerElement.dataset.playerUnicId = this.playerUnicId;
         this.playerElement.innerHTML += this.playerTemplate;
         this.playerVideo = playerElement.querySelector('video');
         this.playerHandle = playerElement.querySelector('.player__handle');
@@ -84,6 +83,7 @@ class Player {
         this.initializeVideo();
         this.initializeProgressbar();
         this.initializeVolume();
+        this.initializeAutoplay();
         this.initializeFullscreen();
     }
 
@@ -126,7 +126,7 @@ class Player {
 
         this.playerVideo.addEventListener('suspend', (event) => {
             console.log('video suspend', event);
-            this.unMuteVolume();
+            // this.unMuteVolume();
         });
 
         this.playerVideo.addEventListener('durationchange', ({ target }) => {
@@ -148,8 +148,18 @@ class Player {
             this.updateVolumeInformation();
         });
 
+        this.playerVideo.addEventListener('fullscreenchange', (event) => {
+            console.log('fullscreenchange', event);
+            // this.pauseVideo();
+            if (!document.fullscreenElement) {
+                this.closeFullscreen();
+            }
+        });
+
         // Video controls appear after exiting full screen mode on iOS
         this.playerVideo.addEventListener('webkitendfullscreen', () => {
+            console.log('webkitendfullscreen event');
+            this.closeFullscreen();
             this.pauseVideo();
         });
 
@@ -193,7 +203,7 @@ class Player {
             this.playerVolumeBar.style.display = 'none ';
         }
 
-        this.playerVideo.muted ? this.muteVolume() : this.unMuteVolume();
+        // this.playerVideo.muted ? this.muteVolume() : this.unMuteVolume();
 
         this.playerVolumeToggle.addEventListener('click', () => {
             console.log('playerVolumeToggle', this.playerVideo, this.playerVideo.volume);
@@ -210,6 +220,30 @@ class Player {
             this.playerVideo.muted = false;
             this.playerVideo.volume = Number(value);
         });
+    }
+
+    initializeAutoplay() {
+        if (this.autoPlay) {
+            const presentationObserver = new IntersectionObserver(
+                (entries, observer) => {
+                    entries.forEach((entry) => {
+                        console.log('observer entry', entry);
+
+                        if (entry.isIntersecting) {
+                            this.autoPlayVideo();
+                            return;
+                        }
+
+                        this.pauseVideo();
+                    });
+                },
+                {
+                    rootMargin: '-25% 0px -25% 0px',
+                }
+            );
+
+            presentationObserver.observe(this.playerElement);
+        }
     }
 
     initializeFullscreen() {
@@ -258,7 +292,7 @@ class Player {
         this.playerVideo.pause();
     }
 
-    autoPlay() {
+    autoPlayVideo() {
         this.muteVolume();
         this.playVideo();
     }
@@ -324,6 +358,9 @@ class Player {
             console.log('webkitExitFullscreen');
             this.playerVideo.webkitExitFullscreen();
         }
+
+        const exitFullscreenEvent = new Event('exitFullscreen');
+        this.playerElement.dispatchEvent(exitFullscreenEvent);
     }
 
     isIOS() {

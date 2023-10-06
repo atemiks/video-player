@@ -1,0 +1,13 @@
+#presentationModal .modal-header,
+#presentationModal .modal-body {
+    padding: 0;
+    border: none;
+}
+
+#presentationModal .modal-header .close {
+    position: absolute;
+    z-index: 9;
+    top: 0;
+    right: 0;
+    transform: translate(100%, -100%);
+}

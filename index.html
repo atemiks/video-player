@@ -7,7 +7,9 @@
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="https://maxvi.ru/local/templates/main/css/bootstrap.css" />
         <link rel="stylesheet" href="./css/player.css" />
+        <link rel="stylesheet" href="./css//modalPresentation.css" />
 
         <style>
             body {
@@ -46,6 +48,12 @@
     </head>
     <body>
         <section class="presentation">
+            <div class="container text-center">
+                <button class="btn btn-success" data-toggle="modal" data-target="#presentationModal">Открыть видео в модальном окне</button>
+            </div>
+        </section>
+
+        <section class="presentation">
             <div class="container">
                 <div class="player">
                     <video class="player__video" poster="./media/maxvi-PS-04-poster.jpg" playsinline muted controlsList="nodownload">
@@ -77,37 +85,35 @@
                 </div>
             </div>
         </section>
+
+        <div class="modal" id="presentationModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="player">
+                            <video class="player__video" poster="./media/maxvi-PS-04-poster.jpg" playsinline controlsList="nodownload">
+                                <source src="./media/maxvi-PS-04.mp4" type="video/mp4" />
+                                Ваш браузер не поддерживает тег video
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 
+    <script src="https://maxvi.ru/local/templates/main/js/jquery.min.js"></script>
+    <script src="https://maxvi.ru/local/templates/main/js/bootstrap.js"></script>
     <script src="./js/player.js"></script>
+    <script src="./js/modalPresentation.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const presentationObserver = new IntersectionObserver(
-                (entries, observer) => {
-                    entries.forEach((entry) => {
-                        const { target } = entry;
-                        const playerInicId = Number(target.dataset.playerUnicId);
-                        const playerInstance = playerInstances.find((instance) => {
-                            return instance.playerUnicId === playerInicId;
-                        });
-                        if (entry.isIntersecting) {
-                            playerInstance.autoPlay();
-                            return;
-                        }
-                        playerInstance.pauseVideo();
-                    });
-                },
-                {
-                    rootMargin: '-25% 0px -25% 0px',
-                }
-            );
-
-            const playerInstances = [];
-            const players = document.querySelectorAll('.player');
-
-            players.forEach((player) => {
-                playerInstances.push(new Player(player));
-                presentationObserver.observe(player);
+            const presentationPlayers = document.querySelectorAll('.presentation .player');
+            presentationPlayers.forEach((player) => {
+                new Player(player, { autoPlay: true });
             });
         });
     </script>
