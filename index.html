@@ -113,7 +113,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const presentationPlayers = document.querySelectorAll('.presentation .player');
             presentationPlayers.forEach((player) => {
-                new Player(player, { autoPlay: true });
+                new Player(player, { autoPlay: true, downloadUrl: './media/maxvi-PS-04.mp4' });
             });
         });
     </script>

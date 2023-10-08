@@ -49,9 +49,10 @@ class Player {
     </div>
   `;
 
-    constructor(playerElement, { autoPlay = false } = {}) {
+    constructor(playerElement, { autoPlay = false, downloadUrl } = {}) {
         this.playerElement = playerElement;
         this.autoPlay = autoPlay;
+        this.downloadUrl = downloadUrl;
         this.playerVideo = undefined;
         this.playerHandle = undefined;
         this.playerIsland = undefined;
@@ -245,7 +246,7 @@ class Player {
 
     initializeDownload() {
         this.playerDownload.style.display = 'block';
-        this.playerDownload.href = this.playerVideo.currentSrc;
+        this.playerDownload.href = this.downloadUrl || this.playerVideo.currentSrc;
     }
 
     initializeFullscreen() {
