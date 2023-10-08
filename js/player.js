@@ -14,6 +14,9 @@ class Player {
     iconVolumeUp = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor" >
     <path d="M560-131v-82q90-26 145-100t55-168q0-94-55-168T560-749v-82q124 28 202 125.5T840-481q0 127-78 224.5T560-131ZM120-360v-240h160l200-200v640L280-360H120Zm440 40v-322q47 22 73.5 66t26.5 96q0 51-26.5 94.5T560-320Z"/>
   </svg>`;
+    iconDownload = `<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor" >
+        <path d="M480-320 280-520l56-58 104 104v-326h80v326l104-104 56 58-200 200ZM240-160q-33 0-56.5-23.5T160-240v-120h80v120h480v-120h80v120q0 33-23.5 56.5T720-160H240Z"/>
+    </svg>`;
 
     playerTemplate = `
     <button type="button" class="player__handle">
@@ -40,6 +43,7 @@ class Player {
       </div>
 
       <div class="player__controls" >
+        <a class="player__control player__download" style="display: none;" download>${this.iconDownload}</a>
         <button type="button" class="player__control player__fullscreen" >${this.iconFullscreen}</button>
       </div>
     </div>
@@ -58,6 +62,7 @@ class Player {
         this.playerVolumeToggle = undefined;
         this.playerVolumeBar = undefined;
         this.playerVolumeRange = undefined;
+        this.playerDownload = undefined;
         this.playerFullscreen = undefined;
         this.playerHideControlsTimeoutId = undefined;
         this.initialize();
@@ -77,6 +82,7 @@ class Player {
         this.playerVolumeToggle = playerElement.querySelector('.player__volume-toggle');
         this.playerVolumeBar = playerElement.querySelector('.player__volume-bar');
         this.playerVolumeRange = playerElement.querySelector('.player__volume-range');
+        this.playerDownload = playerElement.querySelector('.player__download');
         this.playerFullscreen = playerElement.querySelector('.player__fullscreen');
         this.updateTimeInformation(this.playerVideo.currentTime, this.playerVideo.duration);
 
@@ -114,6 +120,10 @@ class Player {
             }
         });
 
+        this.playerVideo.addEventListener('loadedmetadata', () => {
+            this.initializeDownload();
+        });
+
         this.playerVideo.addEventListener('play', () => {
             this.playerHandle.innerHTML = this.iconPause;
             this.hideControlsWithDelay();
@@ -122,11 +132,6 @@ class Player {
         this.playerVideo.addEventListener('pause', () => {
             this.playerHandle.innerHTML = this.iconPlay;
             this.showControls();
-        });
-
-        this.playerVideo.addEventListener('suspend', (event) => {
-            console.log('video suspend', event);
-            // this.unMuteVolume();
         });
 
         this.playerVideo.addEventListener('durationchange', ({ target }) => {
@@ -149,8 +154,6 @@ class Player {
         });
 
         this.playerVideo.addEventListener('fullscreenchange', (event) => {
-            console.log('fullscreenchange', event);
-            // this.pauseVideo();
             if (!document.fullscreenElement) {
                 this.closeFullscreen();
             }
@@ -158,7 +161,6 @@ class Player {
 
         // Video controls appear after exiting full screen mode on iOS
         this.playerVideo.addEventListener('webkitendfullscreen', () => {
-            console.log('webkitendfullscreen event');
             this.closeFullscreen();
             this.pauseVideo();
         });
@@ -203,10 +205,7 @@ class Player {
             this.playerVolumeBar.style.display = 'none ';
         }
 
-        // this.playerVideo.muted ? this.muteVolume() : this.unMuteVolume();
-
         this.playerVolumeToggle.addEventListener('click', () => {
-            console.log('playerVolumeToggle', this.playerVideo, this.playerVideo.volume);
             if (this.playerVideo.muted) {
                 this.unMuteVolume();
                 return;
@@ -227,8 +226,6 @@ class Player {
             const presentationObserver = new IntersectionObserver(
                 (entries, observer) => {
                     entries.forEach((entry) => {
-                        console.log('observer entry', entry);
-
                         if (entry.isIntersecting) {
                             this.autoPlayVideo();
                             return;
@@ -244,6 +241,11 @@ class Player {
 
             presentationObserver.observe(this.playerElement);
         }
+    }
+
+    initializeDownload() {
+        this.playerDownload.style.display = 'block';
+        this.playerDownload.href = this.playerVideo.currentSrc;
     }
 
     initializeFullscreen() {
@@ -298,13 +300,11 @@ class Player {
     }
 
     muteVolume() {
-        console.log('muteVolume callded');
         this.playerVideo.muted = true;
         this.updateVolumeInformation();
     }
 
     unMuteVolume() {
-        console.log('unMuteVolume callded');
         this.playerVideo.muted = false;
         this.updateVolumeInformation();
     }
@@ -352,10 +352,8 @@ class Player {
 
     closeFullscreen() {
         if (this.playerVideo.exitFullscreen) {
-            console.log('exitFullscreen');
             this.playerVideo.exitFullscreen();
         } else if (this.playerVideo.webkitExitFullscreen) {
-            console.log('webkitExitFullscreen');
             this.playerVideo.webkitExitFullscreen();
         }
 
